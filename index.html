@@ -101,6 +101,11 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(26px,6vw,40px);lin
 .copied{font-size:13px;opacity:.7;margin:0}
 
 .decline{align-self:flex-start;background:none;border:0;color:var(--dim);text-decoration:underline;font-size:14px;padding:0}
+[hidden]{display:none!important}
+.step{display:flex;flex-direction:column;gap:12px}
+.back{align-self:flex-start;background:none;border:0;color:var(--brass);font-weight:700;font-size:15px;padding:4px 0}
+.answer .back{color:var(--stub-ink)}
+.progress{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin:0}
 footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-top:16px}
 </style>
 </head>
@@ -114,7 +119,8 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     <h1>Bora cinema hoje?</h1>
   </header>
 
-  <section aria-labelledby="q-place" style="display:flex;flex-direction:column;gap:12px">
+  <section class="step" id="step-place" aria-labelledby="q-place">
+    <p class="progress">Etapa 1 de 3</p>
     <p class="step-label" id="q-place">Escolha o lugar</p>
     <div class="places">
       <button class="place" id="place-market" data-place="market" aria-pressed="false">
@@ -124,9 +130,12 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
         <span class="pname">Santa Cruz</span><span class="paddr">Cinemark · Shopping Metrô Santa Cruz</span>
       </button>
     </div>
+    <button class="decline" id="decline" type="button">Hoje não vai dar</button>
   </section>
 
-  <section id="films-section" hidden aria-labelledby="q-film" style="display:flex;flex-direction:column;gap:12px">
+  <section class="step" id="films-section" hidden aria-labelledby="q-film">
+    <button class="back" id="back-place" type="button">← Trocar o lugar</button>
+    <p class="progress">Etapa 2 de 3</p>
     <p class="step-label" id="q-film">Escolha o filme e o horário · <span id="place-name"></span></p>
     <p class="hint" id="clock" hidden></p>
     <div class="films">
@@ -166,7 +175,8 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
   </section>
 
   <section class="answer" id="answer" hidden aria-live="polite">
-    <p class="lbl">Sua resposta</p>
+    <button class="back" id="back-films" type="button">← Voltar</button>
+    <p class="lbl">Etapa 3 de 3 · Sua resposta</p>
     <p class="choice" id="answer-choice"></p>
     <p class="sub" id="answer-sub"></p>
     <div class="actions">
@@ -175,8 +185,6 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     </div>
     <p class="copied" id="copied" hidden></p>
   </section>
-
-  <button class="decline" id="decline" type="button">Hoje não vai dar</button>
 
   <footer>Horários do Cinemark SP Market e do Cinemark Metrô Santa Cruz para 22/10/2026, segundo o AdoroCinema. Confirme no app da Cinemark antes de comprar.</footer>
 </div>
@@ -210,10 +218,14 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     $("answer-sub").textContent = sub;
     $("send-zap").href = (PHONE ? "https://wa.me/"+PHONE : "https://wa.me/") + "?text=" + encodeURIComponent(msg);
     $("copied").hidden = true;
-    answer.hidden = false;
-    answer.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"nearest"});
+    show(answer);
   }
 
+  var stepPlace = $("step-place"), lastPlace = null;
+  function show(el){
+    [stepPlace, films, answer].forEach(function(s){ s.hidden = (s !== el); });
+    window.scrollTo({top:0, behavior: reduce ? "auto" : "smooth"});
+  }
   function renderSessions(place){
     var p = PLACES[place];
     $("place-name").textContent = p.short;
@@ -248,17 +260,19 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
   document.querySelectorAll(".place").forEach(function(btn){
     btn.addEventListener("click", function(){
       document.querySelectorAll(".place").forEach(function(o){o.setAttribute("aria-pressed", String(o===btn))});
-      renderSessions(btn.dataset.place);
-      films.hidden = false; answer.hidden = true;
-      films.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"});
+      lastPlace = btn.dataset.place;
+      renderSessions(lastPlace);
+      show(films);
     });
   });
 
   $("decline").addEventListener("click", function(){
-    document.querySelectorAll(".place").forEach(function(o){o.setAttribute("aria-pressed","false")});
-    films.hidden = true;
+    lastPlace = null;
     setAnswer("Hoje não vai dar", "Fica pra próxima.", "Hoje não vai dar pro cinema 😕 Fica pra próxima!");
   });
+
+  $("back-place").addEventListener("click", function(){ show(stepPlace); });
+  $("back-films").addEventListener("click", function(){ show(lastPlace ? films : stepPlace); });
 
   $("copy").addEventListener("click", function(){
     var note = $("copied");
