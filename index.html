@@ -102,6 +102,18 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(26px,6vw,40px);lin
 
 .decline{align-self:flex-start;background:none;border:0;color:var(--dim);text-decoration:underline;font-size:14px;padding:0}
 [hidden]{display:none!important}
+.film.pickable{cursor:pointer;transition:border-color .15s,transform .15s}
+.film.pickable:hover{border-color:var(--brass)}
+.film.pickable:active{transform:scale(.99)}
+.film.pickable:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+.preview{font-size:14px;color:var(--dim);margin:0 0 12px;font-variant-numeric:tabular-nums}
+.preview s{opacity:.5}
+.pick{display:inline-flex;align-items:center;gap:8px;background:var(--brass);color:var(--stub-ink);font-weight:700;font-size:16px;padding:12px 20px;border-radius:999px}
+.chosen{display:grid;grid-template-columns:88px minmax(0,1fr);gap:16px;align-items:center;background:var(--seat);border:1px solid var(--seam);border-radius:18px;padding:14px}
+.chosen img{width:100%;max-width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;display:block}
+.chosen .ct{font-family:var(--display);font-weight:900;font-size:clamp(26px,6vw,36px);line-height:.95;text-transform:uppercase;margin:0;text-wrap:balance}
+.chosen .cp{font-size:14px;color:var(--dim);margin:6px 0 0}
+#time-stubs .stub{font-size:34px;padding:14px 22px 14px 26px}
 .step{display:flex;flex-direction:column;gap:12px}
 .back{align-self:flex-start;background:none;border:0;color:var(--brass);font-weight:700;font-size:15px;padding:4px 0}
 .answer .back{color:var(--stub-ink)}
@@ -120,7 +132,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
   </header>
 
   <section class="step" id="step-place" aria-labelledby="q-place">
-    <p class="progress">Etapa 1 de 3</p>
+    <p class="progress">Etapa 1 de 4</p>
     <p class="step-label" id="q-place">Escolha o lugar</p>
     <div class="places">
       <button class="place" id="place-market" data-place="market" aria-pressed="false">
@@ -135,11 +147,11 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
 
   <section class="step" id="films-section" hidden aria-labelledby="q-film">
     <button class="back" id="back-place" type="button">← Trocar o lugar</button>
-    <p class="progress">Etapa 2 de 3</p>
-    <p class="step-label" id="q-film">Escolha o filme e o horário · <span id="place-name"></span></p>
-    <p class="hint" id="clock" hidden></p>
+    <p class="progress">Etapa 2 de 4</p>
+    <p class="step-label" id="q-film">Escolha o filme · <span id="place-name"></span></p>
+    <p class="hint">Toque no filme que você quer ver.</p>
     <div class="films">
-      <article class="film" data-film="Cara-de-Barro">
+      <article class="film pickable" data-film="Cara-de-Barro" data-market="18:00 D|19:00 D|19:30 D|20:30 D|21:30 D" data-santacruz="16:50 D|18:00 D|19:30 L|20:30 L|22:00 D" role="button" tabindex="0" aria-label="Escolher Cara-de-Barro">
         <img class="poster" src="cara-de-barro.jpg" alt="Pôster de Cara-de-Barro">
         <div class="facts">
           <div class="badges"><span class="badge new">Estreia</span><span class="ci ci-18" title="Não recomendado para menores de 18 anos">18</span></div>
@@ -147,10 +159,10 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
           <p class="meta">Terror · Suspense · EUA<br>Dir. <b>James Watkins</b> · com <b>Tom Rhys Harries, Naomi Ackie</b></p>
         </div>
         <p class="syn">Novo filme do universo DC. Uma criatura de barro capaz de mudar de rosto ronda Gotham City, ora como inimiga, ora como aliada do Batman.</p>
-        <div class="sessions"><div class="stubs" data-market="18:00 D|19:00 D|19:30 D|20:30 D|21:30 D" data-santacruz="16:50 D|18:00 D|19:30 L|20:30 L|22:00 D"></div></div>
+        <div class="sessions"><p class="preview"></p><span class="pick">Escolher este filme →</span></div>
       </article>
 
-      <article class="film" data-film="O Outro Lado das Redes">
+      <article class="film pickable" data-film="O Outro Lado das Redes" data-market="20:40 D" data-santacruz="16:20 L|21:30 L" role="button" tabindex="0" aria-label="Escolher O Outro Lado das Redes">
         <img class="poster" src="outro-lado-das-redes.jpg" alt="Pôster de O Outro Lado das Redes">
         <div class="facts">
           <div class="badges"><span class="badge new">Estreia</span><span class="ci ci-14" title="Não recomendado para menores de 14 anos">14</span></div>
@@ -158,10 +170,10 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
           <p class="meta">Drama · EUA<br>Dir. <b>Aaron Sorkin</b> · com <b>Mikey Madison, Jeremy Allen White</b></p>
         </div>
         <p class="syn">Baseado em fatos: a engenheira Frances Haugen e o jornalista Jeff Horwitz se unem para expor o que o Facebook escondia sobre os efeitos das redes.</p>
-        <div class="sessions"><div class="stubs" data-market="20:40 D" data-santacruz="16:20 L|21:30 L"></div></div>
+        <div class="sessions"><p class="preview"></p><span class="pick">Escolher este filme →</span></div>
       </article>
 
-      <article class="film" data-film="Verity">
+      <article class="film pickable" data-film="Verity" data-market="18:40 D|21:20 D" data-santacruz="16:10 L|18:20 L|20:50 L|21:45 L" role="button" tabindex="0" aria-label="Escolher Verity">
         <img class="poster" src="verity.jpg" alt="Pôster de Verity">
         <div class="facts">
           <div class="badges"><span class="ci ci-16" title="Não recomendado para menores de 16 anos">16</span></div>
@@ -169,14 +181,23 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
           <p class="meta">Suspense · Drama · EUA<br>Dir. <b>Michael Showalter</b> · com <b>Anne Hathaway, Dakota Johnson</b></p>
         </div>
         <p class="syn">Uma escritora sem dinheiro é contratada para terminar a série de uma autora best-seller que ficou paralisada após um acidente, e descobre que nada naquela casa é o que parece.</p>
-        <div class="sessions"><div class="stubs" data-market="18:40 D|21:20 D" data-santacruz="16:10 L|18:20 L|20:50 L|21:45 L"></div></div>
+        <div class="sessions"><p class="preview"></p><span class="pick">Escolher este filme →</span></div>
       </article>
     </div>
   </section>
 
+  <section class="step" id="step-time" hidden aria-labelledby="q-time">
+    <button class="back" id="back-films2" type="button">← Trocar o filme</button>
+    <p class="progress">Etapa 3 de 4</p>
+    <div class="chosen"><img id="chosen-img" src="" alt=""><div><p class="ct" id="chosen-title"></p><p class="cp" id="chosen-place"></p></div></div>
+    <p class="step-label" id="q-time">Escolha o horário</p>
+    <p class="hint" id="clock" hidden></p>
+    <div class="stubs" id="time-stubs"></div>
+  </section>
+
   <section class="answer" id="answer" hidden aria-live="polite">
     <button class="back" id="back-films" type="button">← Voltar</button>
-    <p class="lbl">Etapa 3 de 3 · Sua resposta</p>
+    <p class="lbl">Etapa 4 de 4 · Sua resposta</p>
     <p class="choice" id="answer-choice"></p>
     <p class="sub" id="answer-sub"></p>
     <div class="actions">
@@ -221,39 +242,61 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     show(answer);
   }
 
-  var stepPlace = $("step-place"), lastPlace = null;
+  var stepPlace = $("step-place"), stepTime = $("step-time"), lastPlace = null, lastFilm = null;
   function show(el){
-    [stepPlace, films, answer].forEach(function(s){ s.hidden = (s !== el); });
+    [stepPlace, films, stepTime, answer].forEach(function(s){ s.hidden = (s !== el); });
     window.scrollTo({top:0, behavior: reduce ? "auto" : "smooth"});
   }
-  function renderSessions(place){
-    var p = PLACES[place];
-    $("place-name").textContent = p.short;
-    document.querySelectorAll(".stubs").forEach(function(box){
-      var film = box.closest(".film").dataset.film;
-      box.textContent = "";
-      box.dataset[place].split("|").forEach(function(s){
-        var t = s.split(" ")[0], v = VER[s.split(" ")[1]];
-        var b = document.createElement("button");
-        b.type = "button"; b.className = "stub";
-        b.appendChild(document.createTextNode(t));
-        var sm = document.createElement("small"); sm.textContent = v.tag; b.appendChild(sm);
-        b.setAttribute("aria-pressed","false");
-        b.setAttribute("aria-label", film+" às "+t+", "+v.word);
-        var m = (+t.slice(0,2))*60 + (+t.slice(3));
-        if(isToday && m < nowMin){ b.disabled = true; b.title = "Essa sessão já começou"; }
-        b.addEventListener("click", function(){
-          document.querySelectorAll(".stub[aria-pressed='true']").forEach(function(o){o.setAttribute("aria-pressed","false")});
-          b.setAttribute("aria-pressed","true");
-          setAnswer(film+" · "+t, p.full+", hoje (quinta, 22/10). Sessão "+v.fem+".",
-            "Bora! 🎬 Escolhi "+film+" ("+v.word+") às "+t+" no "+p.full+", hoje.");
-        });
-        box.appendChild(b);
+  function sessionsOf(card, place){
+    return card.dataset[place].split("|").map(function(s){
+      var t = s.split(" ")[0];
+      return {t:t, v:VER[s.split(" ")[1]], past: isToday && ((+t.slice(0,2))*60 + (+t.slice(3))) < nowMin};
+    });
+  }
+  function renderFilms(place){
+    $("place-name").textContent = PLACES[place].short;
+    document.querySelectorAll(".film.pickable").forEach(function(card){
+      var pv = card.querySelector(".preview");
+      pv.textContent = "Sessões: ";
+      sessionsOf(card, place).forEach(function(x, i){
+        if(i) pv.appendChild(document.createTextNode(" · "));
+        var el = document.createElement(x.past ? "s" : "span");
+        el.textContent = x.t + " " + x.v.tag.toLowerCase();
+        pv.appendChild(el);
       });
     });
   }
+  function openFilm(card){
+    var place = lastPlace, p = PLACES[place], film = card.dataset.film;
+    lastFilm = card;
+    var img = card.querySelector(".poster");
+    $("chosen-img").src = img.getAttribute("src"); $("chosen-img").alt = img.alt;
+    $("chosen-title").textContent = film;
+    $("chosen-place").textContent = p.full + " · hoje";
+    var box = $("time-stubs"); box.textContent = "";
+    var open = 0;
+    sessionsOf(card, place).forEach(function(x){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "stub";
+      b.appendChild(document.createTextNode(x.t));
+      var sm = document.createElement("small"); sm.textContent = x.v.tag; b.appendChild(sm);
+      b.setAttribute("aria-label", x.t+", "+x.v.word);
+      if(x.past){ b.disabled = true; b.title = "Essa sessão já começou"; } else open++;
+      b.addEventListener("click", function(){
+        setAnswer(film+" · "+x.t, p.full+", hoje (quinta, 22/10). Sessão "+x.v.fem+".",
+          "Bora! 🎬 Escolhi "+film+" ("+x.v.word+") às "+x.t+" no "+p.full+", hoje.");
+      });
+      box.appendChild(b);
+    });
+    if(!open){ var n = document.createElement("p"); n.className = "hint"; n.textContent = "As sessões de hoje desse filme já começaram. Volte e escolha outro."; box.appendChild(n); }
+    show(stepTime);
+  }
+  document.querySelectorAll(".film.pickable").forEach(function(card){
+    card.addEventListener("click", function(){ openFilm(card); });
+    card.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openFilm(card); } });
+  });
 
-  if(isToday){ $("clock").textContent = "Agora são "+parts.hour+":"+parts.minute+". Sessões que já começaram ficam riscadas. DUB = dublado, LEG = legendado."; }
+  if(isToday){ $("clock").textContent = "Agora são "+parts.hour+":"+parts.minute+". Sessões que já começaram ficam riscadas."; }
   else { $("clock").textContent = "DUB = dublado, LEG = legendado."; }
   $("clock").hidden = false;
 
@@ -261,18 +304,19 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     btn.addEventListener("click", function(){
       document.querySelectorAll(".place").forEach(function(o){o.setAttribute("aria-pressed", String(o===btn))});
       lastPlace = btn.dataset.place;
-      renderSessions(lastPlace);
+      renderFilms(lastPlace);
       show(films);
     });
   });
 
   $("decline").addEventListener("click", function(){
-    lastPlace = null;
+    lastPlace = null; lastFilm = null;
     setAnswer("Hoje não vai dar", "Fica pra próxima.", "Hoje não vai dar pro cinema 😕 Fica pra próxima!");
   });
 
   $("back-place").addEventListener("click", function(){ show(stepPlace); });
-  $("back-films").addEventListener("click", function(){ show(lastPlace ? films : stepPlace); });
+  $("back-films").addEventListener("click", function(){ show(lastFilm ? stepTime : stepPlace); });
+  $("back-films2").addEventListener("click", function(){ show(films); });
 
   $("copy").addEventListener("click", function(){
     var note = $("copied");
