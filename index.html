@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bora Cinema Hoje</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one question at a time — place → film + session → send. Cards stack on phones. */
+:root{
+  --curtain:#170c10;
+  --seat:#22131a;
+  --seam:#3a2430;
+  --ink:#f5ece4;
+  --dim:#b9a69f;
+  --brass:#e2a94b;
+  --stub:#f3e6d3;
+  --stub-ink:#2a1a12;
+  --zap:#25d366;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--curtain);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.page{max-width:860px;margin:0 auto;padding-block:36px 56px;display:flex;flex-direction:column;gap:26px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+
+header{display:flex;flex-direction:column;gap:10px}
+.bulbs{display:flex;gap:9px}
+.bulbs i{width:9px;height:9px;border-radius:50%;background:var(--brass);box-shadow:0 0 10px var(--brass)}
+.bulbs i:nth-child(even){opacity:.45;box-shadow:none}
+@media (prefers-reduced-motion:no-preference){.bulbs i{animation:blink 2.4s infinite steps(1)}.bulbs i:nth-child(even){animation-delay:1.2s}}
+@keyframes blink{50%{opacity:.35;box-shadow:none}}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--brass)}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(52px,13vw,104px);line-height:.88;margin:0;text-transform:uppercase;text-wrap:balance}
+.step-label{font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:0}
+
+/* place choice */
+.places{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:560px){.places{grid-template-columns:1fr 1fr}}
+.place{text-align:left;background:var(--seat);border:2px solid var(--seam);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,background .15s}
+.place:hover{border-color:var(--dim)}
+.place[aria-pressed="true"]{border-color:var(--brass);background:#2c1a1a}
+.place .pname{font-family:var(--display);font-weight:900;font-size:32px;line-height:1;text-transform:uppercase}
+.place .paddr{font-size:14px;color:var(--dim)}
+
+/* films */
+.films{display:flex;flex-direction:column;gap:18px}
+.film{background:var(--seat);border:1px solid var(--seam);border-radius:20px;padding:16px;display:grid;grid-template-columns:120px minmax(0,1fr);gap:14px 18px}
+@media (min-width:640px){.film{grid-template-columns:190px minmax(0,1fr);padding:20px;gap:16px 26px}}
+.poster{width:100%;max-width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:12px;display:block;background:#000}
+@media (min-width:640px){.poster{grid-row:span 3}}
+.facts{display:flex;flex-direction:column;gap:6px;min-width:0}
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--seam);color:var(--ink)}
+.badge.new{background:var(--brass);color:var(--stub-ink)}
+.ci{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;padding:0 6px;border-radius:5px;font-size:13px;font-weight:700;color:#fff}
+.ci-14{background:#f58220}.ci-16{background:#e30613}.ci-18{background:#000;outline:1px solid #555}
+h2{font-family:var(--display);font-weight:900;font-size:clamp(26px,6vw,40px);line-height:.95;margin:2px 0 0;text-transform:uppercase;text-wrap:balance}
+.meta{font-size:14px;color:var(--dim);margin:0}
+.meta b{color:var(--ink);font-weight:600}
+.syn{grid-column:1/-1;font-size:15px;color:#ddd0c8;margin:0;max-width:62ch}
+@media (min-width:640px){.syn{grid-column:2}}
+.sessions{grid-column:1/-1;min-width:0}
+@media (min-width:640px){.sessions{grid-column:2}}
+.stubs{display:flex;flex-wrap:wrap;gap:10px}
+.stub{border:0;background:var(--stub);color:var(--stub-ink);font-family:var(--display);font-weight:900;font-size:28px;line-height:1;padding:11px 18px 11px 22px;border-radius:6px;font-variant-numeric:tabular-nums;transition:transform .12s,background .12s;
+  -webkit-mask:radial-gradient(circle 6px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 6px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+          mask:radial-gradient(circle 6px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 6px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.stub:hover:not(:disabled){transform:translateY(-2px)}
+.stub[aria-pressed="true"]{background:var(--brass);transform:translateY(-2px)}
+.stub small{display:block;font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:.14em;margin-top:4px;opacity:.7}
+.stub:disabled{opacity:.25;text-decoration:line-through;cursor:not-allowed}
+.hint{font-size:13px;color:var(--dim);margin:0}
+
+/* answer panel */
+.answer{background:var(--stub);color:var(--stub-ink);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.answer .lbl{font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;opacity:.65;margin:0}
+.answer .choice{font-family:var(--display);font-weight:900;font-size:clamp(30px,7vw,46px);line-height:.95;text-transform:uppercase;margin:0;text-wrap:balance}
+.answer .sub{font-size:15px;margin:0}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:16px;padding:13px 20px;border-radius:999px;text-decoration:none;border:2px solid transparent}
+.btn-zap{background:var(--zap);color:#062b14}
+.btn-ghost{background:transparent;border-color:var(--stub-ink);color:var(--stub-ink)}
+.copied{font-size:13px;opacity:.7;margin:0}
+
+.decline{align-self:flex-start;background:none;border:0;color:var(--dim);text-decoration:underline;font-size:14px;padding:0}
+footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-top:16px}
+</style>
+</head>
+<body>
+
+
+<div class="page">
+  <header>
+    <div class="bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="eyebrow">Quinta, 22 de outubro</div>
+    <h1>Bora cinema hoje?</h1>
+  </header>
+
+  <section aria-labelledby="q-place" style="display:flex;flex-direction:column;gap:12px">
+    <p class="step-label" id="q-place">Escolha o lugar</p>
+    <div class="places">
+      <button class="place" id="place-market" data-place="market" aria-pressed="false">
+        <span class="pname">SP Market</span><span class="paddr">Cinemark · Av. das Nações Unidas, 22540</span>
+      </button>
+      <button class="place" id="place-santacruz" data-place="santacruz" aria-pressed="false">
+        <span class="pname">Santa Cruz</span><span class="paddr">Cinemark · Shopping Metrô Santa Cruz</span>
+      </button>
+    </div>
+  </section>
+
+  <section id="films-section" hidden aria-labelledby="q-film" style="display:flex;flex-direction:column;gap:12px">
+    <p class="step-label" id="q-film">Escolha o filme e o horário · <span id="place-name"></span></p>
+    <p class="hint" id="clock" hidden></p>
+    <div class="films">
+      <article class="film" data-film="Cara-de-Barro">
+        <img class="poster" src="cara-de-barro.jpg" alt="Pôster de Cara-de-Barro">
+        <div class="facts">
+          <div class="badges"><span class="badge new">Estreia</span><span class="ci ci-18" title="Não recomendado para menores de 18 anos">18</span></div>
+          <h2>Cara-de-Barro</h2>
+          <p class="meta">Terror · Suspense · EUA<br>Dir. <b>James Watkins</b> · com <b>Tom Rhys Harries, Naomi Ackie</b></p>
+        </div>
+        <p class="syn">Novo filme do universo DC. Uma criatura de barro capaz de mudar de rosto ronda Gotham City, ora como inimiga, ora como aliada do Batman.</p>
+        <div class="sessions"><div class="stubs" data-market="18:00 D|19:00 D|19:30 D|20:30 D|21:30 D" data-santacruz="16:50 D|18:00 D|19:30 L|20:30 L|22:00 D"></div></div>
+      </article>
+
+      <article class="film" data-film="O Outro Lado das Redes">
+        <img class="poster" src="outro-lado-das-redes.jpg" alt="Pôster de O Outro Lado das Redes">
+        <div class="facts">
+          <div class="badges"><span class="badge new">Estreia</span><span class="ci ci-14" title="Não recomendado para menores de 14 anos">14</span></div>
+          <h2>O Outro Lado das Redes</h2>
+          <p class="meta">Drama · EUA<br>Dir. <b>Aaron Sorkin</b> · com <b>Mikey Madison, Jeremy Allen White</b></p>
+        </div>
+        <p class="syn">Baseado em fatos: a engenheira Frances Haugen e o jornalista Jeff Horwitz se unem para expor o que o Facebook escondia sobre os efeitos das redes.</p>
+        <div class="sessions"><div class="stubs" data-market="20:40 D" data-santacruz="16:20 L|21:30 L"></div></div>
+      </article>
+
+      <article class="film" data-film="Verity">
+        <img class="poster" src="verity.jpg" alt="Pôster de Verity">
+        <div class="facts">
+          <div class="badges"><span class="ci ci-16" title="Não recomendado para menores de 16 anos">16</span></div>
+          <h2>Verity</h2>
+          <p class="meta">Suspense · Drama · EUA<br>Dir. <b>Michael Showalter</b> · com <b>Anne Hathaway, Dakota Johnson</b></p>
+        </div>
+        <p class="syn">Uma escritora sem dinheiro é contratada para terminar a série de uma autora best-seller que ficou paralisada após um acidente, e descobre que nada naquela casa é o que parece.</p>
+        <div class="sessions"><div class="stubs" data-market="18:40 D|21:20 D" data-santacruz="16:10 L|18:20 L|20:50 L|21:45 L"></div></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="answer" id="answer" hidden aria-live="polite">
+    <p class="lbl">Sua resposta</p>
+    <p class="choice" id="answer-choice"></p>
+    <p class="sub" id="answer-sub"></p>
+    <div class="actions">
+      <a class="btn btn-zap" id="send-zap" href="#" target="_blank" rel="noopener">Enviar no WhatsApp</a>
+      <button class="btn btn-ghost" id="copy" type="button">Copiar mensagem</button>
+    </div>
+    <p class="copied" id="copied" hidden></p>
+  </section>
+
+  <button class="decline" id="decline" type="button">Hoje não vai dar</button>
+
+  <footer>Horários do Cinemark SP Market e do Cinemark Metrô Santa Cruz para 22/10/2026, segundo o AdoroCinema. Confirme no app da Cinemark antes de comprar.</footer>
+</div>
+
+<script>
+(function(){
+  var PHONE = ""; // número do Matheus com DDI, ex.: "5511999999999". Vazio = a pessoa escolhe o contato.
+  var DAY = "2026-10-22";
+  var PLACES = {
+    market:    {short:"SP Market",  full:"Cinemark SP Market"},
+    santacruz: {short:"Santa Cruz", full:"Cinemark Metrô Santa Cruz"}
+  };
+  var VER = {D:{tag:"DUB", word:"dublado", fem:"dublada"}, L:{tag:"LEG", word:"legendado", fem:"legendada"}};
+  var parts = {};
+  try{
+    new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"})
+      .formatToParts(new Date()).forEach(function(p){parts[p.type]=p.value});
+  }catch(e){}
+  var today = parts.year ? parts.year+"-"+parts.month+"-"+parts.day : "";
+  var nowMin = parts.hour ? (+parts.hour)*60+(+parts.minute) : -1;
+  var isToday = today === DAY;
+  var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var $ = function(id){return document.getElementById(id)};
+  var answer = $("answer"), films = $("films-section");
+  var message = "";
+
+  function setAnswer(choice, sub, msg){
+    message = msg;
+    $("answer-choice").textContent = choice;
+    $("answer-sub").textContent = sub;
+    $("send-zap").href = (PHONE ? "https://wa.me/"+PHONE : "https://wa.me/") + "?text=" + encodeURIComponent(msg);
+    $("copied").hidden = true;
+    answer.hidden = false;
+    answer.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"nearest"});
+  }
+
+  function renderSessions(place){
+    var p = PLACES[place];
+    $("place-name").textContent = p.short;
+    document.querySelectorAll(".stubs").forEach(function(box){
+      var film = box.closest(".film").dataset.film;
+      box.textContent = "";
+      box.dataset[place].split("|").forEach(function(s){
+        var t = s.split(" ")[0], v = VER[s.split(" ")[1]];
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "stub";
+        b.appendChild(document.createTextNode(t));
+        var sm = document.createElement("small"); sm.textContent = v.tag; b.appendChild(sm);
+        b.setAttribute("aria-pressed","false");
+        b.setAttribute("aria-label", film+" às "+t+", "+v.word);
+        var m = (+t.slice(0,2))*60 + (+t.slice(3));
+        if(isToday && m < nowMin){ b.disabled = true; b.title = "Essa sessão já começou"; }
+        b.addEventListener("click", function(){
+          document.querySelectorAll(".stub[aria-pressed='true']").forEach(function(o){o.setAttribute("aria-pressed","false")});
+          b.setAttribute("aria-pressed","true");
+          setAnswer(film+" · "+t, p.full+", hoje (quinta, 22/10). Sessão "+v.fem+".",
+            "Bora! 🎬 Escolhi "+film+" ("+v.word+") às "+t+" no "+p.full+", hoje.");
+        });
+        box.appendChild(b);
+      });
+    });
+  }
+
+  if(isToday){ $("clock").textContent = "Agora são "+parts.hour+":"+parts.minute+". Sessões que já começaram ficam riscadas. DUB = dublado, LEG = legendado."; }
+  else { $("clock").textContent = "DUB = dublado, LEG = legendado."; }
+  $("clock").hidden = false;
+
+  document.querySelectorAll(".place").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".place").forEach(function(o){o.setAttribute("aria-pressed", String(o===btn))});
+      renderSessions(btn.dataset.place);
+      films.hidden = false; answer.hidden = true;
+      films.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"});
+    });
+  });
+
+  $("decline").addEventListener("click", function(){
+    document.querySelectorAll(".place").forEach(function(o){o.setAttribute("aria-pressed","false")});
+    films.hidden = true;
+    setAnswer("Hoje não vai dar", "Fica pra próxima.", "Hoje não vai dar pro cinema 😕 Fica pra próxima!");
+  });
+
+  $("copy").addEventListener("click", function(){
+    var note = $("copied");
+    function done(ok){ note.textContent = ok ? "Mensagem copiada. É só colar na conversa." : message; note.hidden = false; }
+    try{ navigator.clipboard.writeText(message).then(function(){done(true)}, function(){done(false)}); }
+    catch(e){ done(false); }
+  });
+})();
+</script>
+
+</body>
+</html>
