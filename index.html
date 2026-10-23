@@ -105,6 +105,9 @@ h2{font-family:var(--display);font-weight:900;font-size:clamp(26px,6vw,40px);lin
 .film.pickable{cursor:pointer;transition:border-color .15s,transform .15s}
 .film.pickable:hover{border-color:var(--brass)}
 .film.pickable:active{transform:scale(.99)}
+.film.none{opacity:.55;cursor:default}
+.film.none:hover{border-color:var(--seam)}
+.film.none .pick{display:none}
 .film.pickable:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
 .preview{font-size:14px;color:var(--dim);margin:0 0 12px;font-variant-numeric:tabular-nums}
 .preview s{opacity:.5}
@@ -127,7 +130,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
 <div class="page">
   <header>
     <div class="bulbs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="eyebrow">Quinta, 22 de outubro</div>
+    <div class="eyebrow" id="day-label">Programação de hoje</div>
     <h1>Bora cinema hoje?</h1>
   </header>
 
@@ -151,7 +154,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     <p class="step-label" id="q-film">Escolha o filme · <span id="place-name"></span></p>
     <p class="hint">Toque no filme que você quer ver.</p>
     <div class="films">
-      <article class="film pickable" data-film="Cara-de-Barro" data-market="18:00 D|19:00 D|19:30 D|20:30 D|21:30 D" data-santacruz="16:50 D|18:00 D|19:30 L|20:30 L|22:00 D" role="button" tabindex="0" aria-label="Escolher Cara-de-Barro">
+      <article class="film pickable" data-film="Cara-de-Barro" role="button" tabindex="0" aria-label="Escolher Cara-de-Barro">
         <img class="poster" src="cara-de-barro.jpg" alt="Pôster de Cara-de-Barro">
         <div class="facts">
           <div class="badges"><span class="badge new">Estreia</span><span class="ci ci-18" title="Não recomendado para menores de 18 anos">18</span></div>
@@ -162,7 +165,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
         <div class="sessions"><p class="preview"></p><span class="pick">Escolher este filme →</span></div>
       </article>
 
-      <article class="film pickable" data-film="O Outro Lado das Redes" data-market="20:40 D" data-santacruz="16:20 L|21:30 L" role="button" tabindex="0" aria-label="Escolher O Outro Lado das Redes">
+      <article class="film pickable" data-film="O Outro Lado das Redes" role="button" tabindex="0" aria-label="Escolher O Outro Lado das Redes">
         <img class="poster" src="outro-lado-das-redes.jpg" alt="Pôster de O Outro Lado das Redes">
         <div class="facts">
           <div class="badges"><span class="badge new">Estreia</span><span class="ci ci-14" title="Não recomendado para menores de 14 anos">14</span></div>
@@ -173,7 +176,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
         <div class="sessions"><p class="preview"></p><span class="pick">Escolher este filme →</span></div>
       </article>
 
-      <article class="film pickable" data-film="Verity" data-market="18:40 D|21:20 D" data-santacruz="16:10 L|18:20 L|20:50 L|21:45 L" role="button" tabindex="0" aria-label="Escolher Verity">
+      <article class="film pickable" data-film="Verity" role="button" tabindex="0" aria-label="Escolher Verity">
         <img class="poster" src="verity.jpg" alt="Pôster de Verity">
         <div class="facts">
           <div class="badges"><span class="ci ci-16" title="Não recomendado para menores de 16 anos">16</span></div>
@@ -207,13 +210,13 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     <p class="copied" id="copied" hidden></p>
   </section>
 
-  <footer>Horários do Cinemark SP Market e do Cinemark Metrô Santa Cruz para 22/10/2026, segundo o AdoroCinema. Confirme no app da Cinemark antes de comprar.</footer>
+  <footer id="footer">Horários do Cinemark SP Market e do Cinemark Metrô Santa Cruz, segundo o AdoroCinema, atualizados todo dia de manhã. Confirme no app da Cinemark antes de comprar.</footer>
 </div>
 
 <script>
 (function(){
   var PHONE = "5511964024555"; // número do Matheus com DDI, ex.: "5511999999999". Vazio = a pessoa escolhe o contato.
-  var DAY = "2026-10-22";
+  var DAY = null, DATA = null, dayShort = "hoje";
   var PLACES = {
     market:    {short:"SP Market",  full:"Cinemark SP Market"},
     santacruz: {short:"Santa Cruz", full:"Cinemark Metrô Santa Cruz"}
@@ -226,7 +229,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
   }catch(e){}
   var today = parts.year ? parts.year+"-"+parts.month+"-"+parts.day : "";
   var nowMin = parts.hour ? (+parts.hour)*60+(+parts.minute) : -1;
-  var isToday = today === DAY;
+  var isToday = false;
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var $ = function(id){return document.getElementById(id)};
@@ -248,17 +251,23 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     window.scrollTo({top:0, behavior: reduce ? "auto" : "smooth"});
   }
   function sessionsOf(card, place){
-    return card.dataset[place].split("|").map(function(s){
-      var t = s.split(" ")[0];
-      return {t:t, v:VER[s.split(" ")[1]], past: isToday && ((+t.slice(0,2))*60 + (+t.slice(3))) < nowMin};
+    var list = (DATA && DATA.cinemas[place] && DATA.cinemas[place][card.dataset.film]) || [];
+    return list.map(function(s){
+      return {t:s.t, v:VER[s.v] || VER.D, past: isToday && ((+s.t.slice(0,2))*60 + (+s.t.slice(3))) < nowMin};
     });
   }
   function renderFilms(place){
     $("place-name").textContent = PLACES[place].short;
     document.querySelectorAll(".film.pickable").forEach(function(card){
       var pv = card.querySelector(".preview");
+      var list = sessionsOf(card, place);
+      var none = !!DATA && list.length === 0;
+      card.classList.toggle("none", none);
+      card.setAttribute("aria-disabled", String(none));
+      if(!DATA){ pv.textContent = "Carregando horários…"; return; }
+      if(none){ pv.textContent = "Sem sessões deste filme hoje neste cinema."; return; }
       pv.textContent = "Sessões: ";
-      sessionsOf(card, place).forEach(function(x, i){
+      list.forEach(function(x, i){
         if(i) pv.appendChild(document.createTextNode(" · "));
         var el = document.createElement(x.past ? "s" : "span");
         el.textContent = x.t + " " + x.v.tag.toLowerCase();
@@ -267,6 +276,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     });
   }
   function openFilm(card){
+    if(!DATA || card.classList.contains("none")) return;
     var place = lastPlace, p = PLACES[place], film = card.dataset.film;
     lastFilm = card;
     var img = card.querySelector(".poster");
@@ -283,7 +293,7 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
       b.setAttribute("aria-label", x.t+", "+x.v.word);
       if(x.past){ b.disabled = true; b.title = "Essa sessão já começou"; } else open++;
       b.addEventListener("click", function(){
-        setAnswer(film+" · "+x.t, p.full+", hoje (quinta, 22/10). Sessão "+x.v.fem+".",
+        setAnswer(film+" · "+x.t, p.full+", "+dayShort+". Sessão "+x.v.fem+".",
           "Bora! 🎬 Escolhi "+film+" ("+x.v.word+") às "+x.t+" no "+p.full+", hoje.");
       });
       box.appendChild(b);
@@ -296,9 +306,29 @@ footer{font-size:13px;color:var(--dim);border-top:1px solid var(--seam);padding-
     card.addEventListener("keydown", function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openFilm(card); } });
   });
 
-  if(isToday){ $("clock").textContent = "Agora são "+parts.hour+":"+parts.minute+". Sessões que já começaram ficam riscadas."; }
-  else { $("clock").textContent = "DUB = dublado, LEG = legendado."; }
-  $("clock").hidden = false;
+  function applyData(d){
+    DATA = d; DAY = d.date; isToday = (today === DAY);
+    var dt = new Date(DAY + "T12:00:00Z");
+    var wd = "", dm = "";
+    try{
+      wd = new Intl.DateTimeFormat("pt-BR",{weekday:"long",timeZone:"UTC"}).format(dt).replace("-feira","");
+      dm = new Intl.DateTimeFormat("pt-BR",{day:"numeric",month:"long",timeZone:"UTC"}).format(dt);
+    }catch(e){}
+    var ddmm = DAY.slice(8,10)+"/"+DAY.slice(5,7);
+    $("day-label").textContent = wd ? wd.charAt(0).toUpperCase()+wd.slice(1)+", "+dm : ddmm;
+    dayShort = isToday ? "hoje ("+wd+", "+ddmm+")" : (wd+", "+ddmm);
+    if(isToday){ $("clock").textContent = "Agora são "+parts.hour+":"+parts.minute+". Sessões que já começaram ficam riscadas."; }
+    else { $("clock").textContent = "Horários de "+ddmm+". A programação de hoje ainda não foi atualizada."; }
+    $("clock").hidden = false;
+    if(lastPlace){ renderFilms(lastPlace); }
+  }
+  fetch("sessions.json?v=" + Date.now(), {cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(applyData)
+    .catch(function(){
+      $("clock").textContent = "Não consegui carregar os horários agora. Recarregue a página em instantes.";
+      $("clock").hidden = false;
+    });
 
   document.querySelectorAll(".place").forEach(function(btn){
     btn.addEventListener("click", function(){
