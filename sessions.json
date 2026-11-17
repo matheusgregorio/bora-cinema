@@ -1,14 +1,41 @@
 {
- "date": "2026-11-16",
- "updated": "2026-11-16T20:44-03:00",
+ "date": "2026-11-17",
+ "updated": "2026-11-17T15:38-03:00",
  "cinemas": {
   "market": {
-   "Cara-de-Barro": [],
+   "Cara-de-Barro": [
+    {
+     "t": "14:25",
+     "v": "D"
+    },
+    {
+     "t": "19:30",
+     "v": "D"
+    },
+    {
+     "t": "22:00",
+     "v": "D"
+    }
+   ],
    "O Outro Lado das Redes": [],
-   "Verity": []
+   "Verity": [
+    {
+     "t": "19:40",
+     "v": "D"
+    }
+   ]
   },
   "santacruz": {
-   "Cara-de-Barro": [],
+   "Cara-de-Barro": [
+    {
+     "t": "16:00",
+     "v": "L"
+    },
+    {
+     "t": "21:20",
+     "v": "L"
+    }
+   ],
    "O Outro Lado das Redes": [],
    "Verity": []
   }
